@@ -3,12 +3,7 @@ import UserNotifications
 
 class NotificationManager {
     private let exerciseManager: ExerciseManager
-    private var currentExercise: ExerciseDefinition?
-
-    private var timerInterval: Int {
-        let interval = UserDefaults.standard.integer(forKey: "timerInterval")
-        return interval > 0 ? interval : 30
-    }
+    private let pausedKey = "remindersPaused"
 
     private var workHoursStart: Int {
         if UserDefaults.standard.object(forKey: "workHoursStart") == nil {
@@ -28,26 +23,75 @@ class NotificationManager {
         self.exerciseManager = exerciseManager
     }
 
+    func pause() {
+        UserDefaults.standard.set(true, forKey: pausedKey)
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+    }
+
+    func resume() {
+        UserDefaults.standard.set(false, forKey: pausedKey)
+        scheduleNextNotification()
+    }
+
+    func isPaused() -> Bool {
+        UserDefaults.standard.bool(forKey: pausedKey)
+    }
+
+    func nextReminderStatus(now: Date) -> (name: String, fireDate: Date)? {
+        guard !isPaused() else { return nil }
+        guard let exercise = exerciseManager.nextDueExercise(now: now) else { return nil }
+        guard let nextDueDate = exerciseManager.nextDueDate(now: now) else { return nil }
+
+        let fireDate = max(now, nextDueDate)
+        if isWithinWorkHours(date: fireDate) {
+            return (exercise.name, fireDate)
+        }
+        return (exercise.name, nextWorkDayStart(from: fireDate))
+    }
+
     func scheduleNextNotification() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
 
-        let now = Date()
-        let calendar = Calendar.current
-        let currentHour = calendar.component(.hour, from: now)
-
-        guard currentHour >= workHoursStart && currentHour < workHoursEnd else {
-            scheduleForNextWorkDay()
+        if isPaused() {
             return
         }
 
-        let exercise = exerciseManager.getCurrentExercise()
-        currentExercise = exercise
+        let now = Date()
 
+        guard let exercise = exerciseManager.nextDueExercise(now: now) else {
+            return
+        }
+        guard let nextDueDate = exerciseManager.nextDueDate(now: now) else {
+            return
+        }
+
+        let fireDate = max(now, nextDueDate)
+        if isWithinWorkHours(date: fireDate) {
+            scheduleNotification(for: exercise, at: fireDate, isSnooze: false)
+            return
+        }
+
+        scheduleForNextWorkDay(exercise: exercise, from: fireDate)
+    }
+
+    func snooze(exercise: ExerciseDefinition, preserveIndex: Int) {
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+
+        let fireDate = Date().addingTimeInterval(300)
+        scheduleNotification(for: exercise, at: fireDate, isSnooze: true)
+    }
+
+    private func scheduleForNextWorkDay(exercise: ExerciseDefinition, from date: Date) {
+        let nextDate = nextWorkDayStart(from: date)
+        scheduleNotification(for: exercise, at: nextDate, isSnooze: false)
+    }
+
+    private func scheduleNotification(for exercise: ExerciseDefinition, at date: Date, isSnooze: Bool) {
         let content = UNMutableNotificationContent()
         content.title = "Time for: \(exercise.name)"
         content.body = exercise.instructions
         content.sound = .default
-        content.userInfo = ["exerciseIndex": exerciseManager.currentIndex, "isSnooze": false]
+        content.userInfo = ["exerciseId": exercise.id, "isSnooze": isSnooze]
 
         let snoozeAction = UNNotificationAction(
             identifier: "SNOOZE_ACTION",
@@ -65,20 +109,11 @@ class NotificationManager {
         UNUserNotificationCenter.current().setNotificationCategories([category])
         content.categoryIdentifier = "EXERCISE_REMINDER"
 
-        let triggerInterval = TimeInterval(timerInterval * 60)
-        let triggerDate = calendar.date(byAdding: .second, value: Int(triggerInterval), to: now)!
-        let triggerHour = calendar.component(.hour, from: triggerDate)
+        let calendar = Calendar.current
+        var dateComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
+        dateComponents.second = dateComponents.second ?? 0
 
-        if triggerHour < workHoursStart || triggerHour >= workHoursEnd {
-            scheduleForNextWorkDay()
-            return
-        }
-
-        let trigger = UNTimeIntervalNotificationTrigger(
-            timeInterval: triggerInterval,
-            repeats: false
-        )
-
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
         let request = UNNotificationRequest(
             identifier: "EXERCISE_NOTIFICATION",
             content: content,
@@ -92,72 +127,23 @@ class NotificationManager {
         }
     }
 
-    func snooze(exercise: ExerciseDefinition, preserveIndex: Int) {
-        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-
-        let content = UNMutableNotificationContent()
-        content.title = "Time for: \(exercise.name)"
-        content.body = exercise.instructions
-        content.sound = .default
-        content.categoryIdentifier = "EXERCISE_REMINDER"
-        content.userInfo = ["exerciseIndex": preserveIndex, "isSnooze": true]
-
-        let trigger = UNTimeIntervalNotificationTrigger(
-            timeInterval: 300,
-            repeats: false
-        )
-
-        let request = UNNotificationRequest(
-            identifier: "EXERCISE_NOTIFICATION",
-            content: content,
-            trigger: trigger
-        )
-
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                print("Error scheduling snooze notification: \(error)")
-            }
-        }
+    private func isWithinWorkHours(date: Date) -> Bool {
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: date)
+        return hour >= workHoursStart && hour < workHoursEnd
     }
 
-    private func scheduleForNextWorkDay() {
+    private func nextWorkDayStart(from date: Date) -> Date {
         let calendar = Calendar.current
-        var components = calendar.dateComponents([.year, .month, .day], from: Date())
+        var components = calendar.dateComponents([.year, .month, .day], from: date)
         components.hour = workHoursStart
         components.minute = 0
         components.second = 0
 
-        guard var nextDate = calendar.date(from: components) else { return }
-
-        if nextDate <= Date() {
+        guard var nextDate = calendar.date(from: components) else { return date }
+        if nextDate <= date {
             nextDate = calendar.date(byAdding: .day, value: 1, to: nextDate) ?? nextDate
         }
-
-        var dateComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: nextDate)
-        dateComponents.second = 0
-
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
-
-        let exercise = exerciseManager.getCurrentExercise()
-        currentExercise = exercise
-
-        let content = UNMutableNotificationContent()
-        content.title = "Time for: \(exercise.name)"
-        content.body = exercise.instructions
-        content.sound = .default
-        content.categoryIdentifier = "EXERCISE_REMINDER"
-        content.userInfo = ["exerciseIndex": exerciseManager.currentIndex, "isSnooze": false]
-
-        let request = UNNotificationRequest(
-            identifier: "EXERCISE_NOTIFICATION",
-            content: content,
-            trigger: trigger
-        )
-
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                print("Error scheduling next work day notification: \(error)")
-            }
-        }
+        return nextDate
     }
 }
