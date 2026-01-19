@@ -2,13 +2,31 @@ import SwiftUI
 import ServiceManagement
 
 struct PreferencesWindow: View {
-    @AppStorage("timerInterval") private var timerInterval: Int = 30
     @AppStorage("workHoursStart") private var workHoursStart: Int = 9
     @AppStorage("workHoursEnd") private var workHoursEnd: Int = 17
     @State private var launchAtLogin: Bool = false
+    @StateObject private var remindersViewModel: RemindersViewModel
 
-    let timerOptions = [15, 30, 45, 60]
+    let intervalOptions = [15, 30, 45, 60, 90, 120]
     let hourOptions = Array(0...23)
+
+    init() {
+        _remindersViewModel = StateObject(
+            wrappedValue: RemindersViewModel(
+                exerciseManager: ExerciseManager(),
+                onScheduleChange: {}
+            )
+        )
+    }
+
+    init(exerciseManager: ExerciseManager, onScheduleChange: @escaping () -> Void) {
+        _remindersViewModel = StateObject(
+            wrappedValue: RemindersViewModel(
+                exerciseManager: exerciseManager,
+                onScheduleChange: onScheduleChange
+            )
+        )
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -17,17 +35,44 @@ struct PreferencesWindow: View {
                 .padding(.bottom, 10)
 
             VStack(alignment: .leading, spacing: 15) {
-                HStack {
-                    Text("Timer Interval:")
-                        .frame(width: 130, alignment: .leading)
+                Text("Reminders")
+                    .font(.headline)
 
-                    Picker("", selection: $timerInterval) {
-                        ForEach(timerOptions, id: \.self) { interval in
-                            Text("\(interval) minutes").tag(interval)
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach($remindersViewModel.exercises) { $exercise in
+                        HStack {
+                            Text(exercise.name)
+                                .frame(width: 180, alignment: .leading)
+
+                            Picker("", selection: $exercise.intervalMinutes) {
+                                ForEach(intervalOptions, id: \.self) { interval in
+                                    let hours = interval / 60
+                                    let minutes = interval % 60
+                                    let label: String
+                                    if interval < 60 {
+                                        label = "\(interval)m"
+                                    } else if minutes == 0 {
+                                        label = "\(hours)h"
+                                    } else {
+                                        label = "\(hours)h \(minutes)m"
+                                    }
+                                    Text(label).tag(interval)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .frame(width: 110)
+                            .onChange(of: exercise.intervalMinutes) { newValue in
+                                remindersViewModel.updateInterval(id: exercise.id, minutes: newValue)
+                            }
+
+                            Toggle("Enabled", isOn: $exercise.enabled)
+                                .toggleStyle(.switch)
+                                .labelsHidden()
+                                .onChange(of: exercise.enabled) { newValue in
+                                    remindersViewModel.updateEnabled(id: exercise.id, enabled: newValue)
+                                }
                         }
                     }
-                    .pickerStyle(.menu)
-                    .frame(width: 150)
                 }
 
                 HStack {
@@ -69,7 +114,7 @@ struct PreferencesWindow: View {
                 .foregroundColor(.secondary)
         }
         .padding(20)
-        .frame(width: 400, height: 300)
+        .frame(width: 520, height: 430)
         .onAppear {
             checkLaunchAtLoginStatus()
         }

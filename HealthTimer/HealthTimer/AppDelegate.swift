@@ -86,9 +86,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openPreferences() {
         if preferencesWindow == nil {
-            let contentView = PreferencesWindow()
+            let contentView = PreferencesWindow(
+                exerciseManager: exerciseManager,
+                onScheduleChange: { [weak self] in
+                    self?.notificationManager.scheduleNextNotification()
+                    self?.updateMenuStatus()
+                }
+            )
             preferencesWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 300),
+                contentRect: NSRect(x: 0, y: 0, width: 520, height: 430),
                 styleMask: [.titled, .closable],
                 backing: .buffered,
                 defer: false
