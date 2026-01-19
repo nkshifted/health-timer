@@ -2,13 +2,31 @@ import SwiftUI
 import ServiceManagement
 
 struct PreferencesWindow: View {
-    @AppStorage("timerInterval") private var timerInterval: Int = 30
     @AppStorage("workHoursStart") private var workHoursStart: Int = 9
     @AppStorage("workHoursEnd") private var workHoursEnd: Int = 17
     @State private var launchAtLogin: Bool = false
+    @StateObject private var remindersViewModel: RemindersViewModel
 
-    let timerOptions = [15, 30, 45, 60]
+    let intervalOptions = [15, 30, 45, 60, 90, 120]
     let hourOptions = Array(0...23)
+
+    init() {
+        _remindersViewModel = StateObject(
+            wrappedValue: RemindersViewModel(
+                exerciseManager: ExerciseManager(),
+                onScheduleChange: {}
+            )
+        )
+    }
+
+    init(exerciseManager: ExerciseManager, onScheduleChange: @escaping () -> Void) {
+        _remindersViewModel = StateObject(
+            wrappedValue: RemindersViewModel(
+                exerciseManager: exerciseManager,
+                onScheduleChange: onScheduleChange
+            )
+        )
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -16,51 +34,7 @@ struct PreferencesWindow: View {
                 .font(.title2)
                 .padding(.bottom, 10)
 
-            VStack(alignment: .leading, spacing: 15) {
-                HStack {
-                    Text("Timer Interval:")
-                        .frame(width: 130, alignment: .leading)
-
-                    Picker("", selection: $timerInterval) {
-                        ForEach(timerOptions, id: \.self) { interval in
-                            Text("\(interval) minutes").tag(interval)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .frame(width: 150)
-                }
-
-                HStack {
-                    Text("Work Hours Start:")
-                        .frame(width: 130, alignment: .leading)
-
-                    Picker("", selection: $workHoursStart) {
-                        ForEach(hourOptions, id: \.self) { hour in
-                            Text(formatHour(hour)).tag(hour)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .frame(width: 150)
-                }
-
-                HStack {
-                    Text("Work Hours End:")
-                        .frame(width: 130, alignment: .leading)
-
-                    Picker("", selection: $workHoursEnd) {
-                        ForEach(hourOptions, id: \.self) { hour in
-                            Text(formatHour(hour)).tag(hour)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .frame(width: 150)
-                }
-
-                Toggle("Launch at Login", isOn: $launchAtLogin)
-                    .onChange(of: launchAtLogin) { newValue in
-                        setLaunchAtLogin(enabled: newValue)
-                    }
-            }
+            remindersSection
 
             Spacer()
 
@@ -69,10 +43,92 @@ struct PreferencesWindow: View {
                 .foregroundColor(.secondary)
         }
         .padding(20)
-        .frame(width: 400, height: 300)
+        .frame(width: 520, height: 430)
         .onAppear {
             checkLaunchAtLoginStatus()
         }
+    }
+
+    private var remindersSection: some View {
+        VStack(alignment: .leading, spacing: 15) {
+            Text("Reminders")
+                .font(.headline)
+
+            remindersList
+
+            HStack {
+                Text("Work Hours Start:")
+                    .frame(width: 130, alignment: .leading)
+
+                Picker("", selection: $workHoursStart) {
+                    ForEach(hourOptions, id: \.self) { hour in
+                        Text(formatHour(hour)).tag(hour)
+                    }
+                }
+                .pickerStyle(.menu)
+                .frame(width: 150)
+            }
+
+            HStack {
+                Text("Work Hours End:")
+                    .frame(width: 130, alignment: .leading)
+
+                Picker("", selection: $workHoursEnd) {
+                    ForEach(hourOptions, id: \.self) { hour in
+                        Text(formatHour(hour)).tag(hour)
+                    }
+                }
+                .pickerStyle(.menu)
+                .frame(width: 150)
+            }
+
+            Toggle("Launch at Login", isOn: $launchAtLogin)
+                .onChange(of: launchAtLogin) { newValue in
+                    setLaunchAtLogin(enabled: newValue)
+                }
+        }
+    }
+
+    private var remindersList: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ForEach($remindersViewModel.exercises, id: \.id) { exercise in
+                HStack {
+                    Text(exercise.wrappedValue.name)
+                        .frame(width: 180, alignment: .leading)
+
+                    Picker("", selection: exercise.intervalMinutes) {
+                        ForEach(0..<intervalOptions.count, id: \.self) { (index: Int) in
+                            let interval = intervalOptions[index]
+                            Text(intervalLabel(for: interval)).tag(interval)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(width: 110)
+                    .onChange(of: exercise.intervalMinutes.wrappedValue) { newValue in
+                        remindersViewModel.updateInterval(id: exercise.wrappedValue.id, minutes: newValue)
+                    }
+
+                    Toggle("Enabled", isOn: exercise.enabled)
+                        .toggleStyle(.switch)
+                        .labelsHidden()
+                        .onChange(of: exercise.enabled.wrappedValue) { newValue in
+                            remindersViewModel.updateEnabled(id: exercise.wrappedValue.id, enabled: newValue)
+                        }
+                }
+            }
+        }
+    }
+
+    private func intervalLabel(for interval: Int) -> String {
+        if interval < 60 {
+            return "\(interval)m"
+        }
+        let hours = interval / 60
+        let minutes = interval % 60
+        if minutes == 0 {
+            return "\(hours)h"
+        }
+        return "\(hours)h \(minutes)m"
     }
 
     private func formatHour(_ hour: Int) -> String {
