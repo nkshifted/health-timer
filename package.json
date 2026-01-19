@@ -1,0 +1,21 @@
+{
+  "name": "health-timer",
+  "version": "1.0.0",
+  "description": "macOS menu bar app with exercise reminders for desk workers to prevent edema and circulation issues",
+  "main": "index.js",
+  "scripts": {
+    "build": "xcodebuild -project HealthTimer/HealthTimer.xcodeproj -scheme HealthTimer -configuration Release build",
+    "clean": "xcodebuild -project HealthTimer/HealthTimer.xcodeproj -scheme HealthTimer clean",
+    "archive": "xcodebuild -project HealthTimer/HealthTimer.xcodeproj -scheme HealthTimer -configuration Release -archivePath ./build/HealthTimer.xcarchive archive"
+  },
+  "keywords": [
+    "macos",
+    "health",
+    "timer",
+    "exercise",
+    "reminder",
+    "ergonomics"
+  ],
+  "author": "",
+  "license": "MIT"
+}
