@@ -18,6 +18,7 @@
 		A2000001000000000000001 /* ReminderSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002000000000000001 /* ReminderSchedulerTests.swift */; };
 		A200000E0000000000000001 /* RemindersViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000F0000000000000001 /* RemindersViewModelTests.swift */; };
 		A2000010000000000000001 /* NotificationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000011000000000000001 /* NotificationManagerTests.swift */; };
+		A2000012000000000000001 /* ExerciseManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000013000000000000001 /* ExerciseManagerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,7 @@
 		A2000002000000000000001 /* ReminderSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderSchedulerTests.swift; sourceTree = "<group>"; };
 		A200000F0000000000000001 /* RemindersViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersViewModelTests.swift; sourceTree = "<group>"; };
 		A2000011000000000000001 /* NotificationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManagerTests.swift; sourceTree = "<group>"; };
+		A2000013000000000000001 /* ExerciseManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseManagerTests.swift; sourceTree = "<group>"; };
 		A2000004000000000000001 /* HealthTimerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HealthTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -96,6 +98,7 @@
 				A2000002000000000000001 /* ReminderSchedulerTests.swift */,
 				A200000F0000000000000001 /* RemindersViewModelTests.swift */,
 				A2000011000000000000001 /* NotificationManagerTests.swift */,
+				A2000013000000000000001 /* ExerciseManagerTests.swift */,
 			);
 			path = HealthTimerTests;
 			sourceTree = "<group>";
@@ -221,6 +224,7 @@
 				A2000001000000000000001 /* ReminderSchedulerTests.swift in Sources */,
 			A200000E0000000000000001 /* RemindersViewModelTests.swift in Sources */,
 			A2000010000000000000001 /* NotificationManagerTests.swift in Sources */,
+			A2000012000000000000001 /* ExerciseManagerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

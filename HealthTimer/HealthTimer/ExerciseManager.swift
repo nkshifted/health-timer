@@ -3,9 +3,15 @@ import Foundation
 class ExerciseManager {
     private let exercises: [ExerciseDefinition] = [
         ExerciseDefinition(
-            id: "ankle-pumps",
-            name: "Ankle Pumps",
-            instructions: "Flex your feet up and down 10-15 times while seated. This activates the calf muscle pump to improve venous return from your lower legs.",
+            id: "ankle-circles",
+            name: "Ankle Circles",
+            instructions: "Sit tall with your feet flat. Lift one foot and draw a circle with your big toe 10 times clockwise and 10 times counterclockwise, then switch feet.",
+            defaultIntervalMinutes: 30
+        ),
+        ExerciseDefinition(
+            id: "seated-heel-toe-rocks",
+            name: "Seated Heel-Toe Rocks",
+            instructions: "Sit tall with both feet flat. Lift your heels, lower them, then lift your toes and lower them. Rock between heels and toes 10-15 times.",
             defaultIntervalMinutes: 30
         ),
         ExerciseDefinition(
@@ -27,16 +33,16 @@ class ExerciseManager {
             defaultIntervalMinutes: 30
         ),
         ExerciseDefinition(
-            id: "toe-raises",
-            name: "Toe Raises",
-            instructions: "While seated or standing, lift your toes off the ground while keeping heels down. Hold for 2 seconds, repeat 10-15 times to strengthen anterior tibialis muscles.",
-            defaultIntervalMinutes: 30
-        ),
-        ExerciseDefinition(
             id: "leg-swings",
             name: "Leg Swings",
             instructions: "Stand on one leg and swing the other leg forward and backward 10 times, then switch legs. This dynamic movement improves circulation and hip mobility.",
             defaultIntervalMinutes: 30
+        ),
+        ExerciseDefinition(
+            id: "hydration",
+            name: "Hydration",
+            instructions: "Time to hydrate — take a few sips of water. Drink regularly throughout the day.",
+            defaultIntervalMinutes: 60
         )
     ]
 
@@ -92,20 +98,27 @@ class ExerciseManager {
 
     func updateInterval(id: String, minutes: Int) {
         userDefaults.set(minutes, forKey: intervalMinutesKey(for: id))
+        if userDefaults.object(forKey: lastFiredAtKey(for: id)) == nil {
+            userDefaults.set(Date(), forKey: anchorKey(for: id))
+        }
     }
 
     func updateEnabled(id: String, enabled: Bool) {
         userDefaults.set(enabled, forKey: enabledKey(for: id))
+        if enabled && userDefaults.object(forKey: lastFiredAtKey(for: id)) == nil {
+            userDefaults.set(Date(), forKey: anchorKey(for: id))
+        }
     }
 
     func markFired(id: String, at: Date) {
         userDefaults.set(at, forKey: lastFiredAtKey(for: id))
+        userDefaults.removeObject(forKey: anchorKey(for: id))
     }
 
     func nextDueExercise(now: Date) -> ExerciseDefinition? {
         let scheduler = ReminderScheduler(
             exercises: exercises,
-            stateById: stateById(),
+            stateById: stateById(now: now),
             recentHistory: recentHistory()
         )
         return scheduler.nextDueExercise(now: now)
@@ -114,7 +127,7 @@ class ExerciseManager {
     func nextDueDate(now: Date) -> Date? {
         let scheduler = ReminderScheduler(
             exercises: exercises,
-            stateById: stateById(),
+            stateById: stateById(now: now),
             recentHistory: recentHistory()
         )
         return scheduler.nextDueDate(now: now)
@@ -137,11 +150,51 @@ class ExerciseManager {
         "exercise.\(id).intervalMinutes"
     }
 
+    private func anchorKey(for id: String) -> String {
+        "exercise.\(id).anchorAt"
+    }
+
     private func enabledKey(for id: String) -> String {
         "exercise.\(id).enabled"
     }
 
     private func lastFiredAtKey(for id: String) -> String {
         "exercise.\(id).lastFiredAt"
+    }
+
+    private func anchorDate(for id: String, now: Date) -> Date {
+        if let stored = userDefaults.object(forKey: anchorKey(for: id)) as? Date {
+            return stored
+        }
+        userDefaults.set(now, forKey: anchorKey(for: id))
+        return now
+    }
+
+    private func stateById(now: Date) -> [String: ExerciseState] {
+        var state: [String: ExerciseState] = [:]
+        for exercise in exercises {
+            let intervalKey = intervalMinutesKey(for: exercise.id)
+            let enabledKey = enabledKey(for: exercise.id)
+            let lastFiredKey = lastFiredAtKey(for: exercise.id)
+
+            let interval = userDefaults.integer(forKey: intervalKey)
+            let storedInterval = interval > 0 ? interval : exercise.defaultIntervalMinutes
+            let enabled: Bool
+            if userDefaults.object(forKey: enabledKey) == nil {
+                enabled = true
+            } else {
+                enabled = userDefaults.bool(forKey: enabledKey)
+            }
+            let lastFiredAt = userDefaults.object(forKey: lastFiredKey) as? Date
+            let effectiveLastFired: Date?
+            if enabled {
+                effectiveLastFired = lastFiredAt ?? anchorDate(for: exercise.id, now: now)
+            } else {
+                effectiveLastFired = lastFiredAt
+            }
+
+            state[exercise.id] = ExerciseState(intervalMinutes: storedInterval, enabled: enabled, lastFiredAt: effectiveLastFired)
+        }
+        return state
     }
 }
