@@ -1,8 +1,16 @@
 import Foundation
 import UserNotifications
 
+protocol UNUserNotificationCenterProtocol {
+    func add(_ request: UNNotificationRequest, withCompletionHandler completionHandler: (@Sendable (Error?) -> Void)?)
+    func removeAllPendingNotificationRequests()
+}
+
+extension UNUserNotificationCenter: UNUserNotificationCenterProtocol {}
+
 class NotificationManager {
     private let exerciseManager: ExerciseManager
+    private let notificationCenter: UNUserNotificationCenterProtocol
     private let pausedKey = "remindersPaused"
 
     private var workHoursStart: Int {
@@ -19,8 +27,9 @@ class NotificationManager {
         return UserDefaults.standard.integer(forKey: "workHoursEnd")
     }
 
-    init(exerciseManager: ExerciseManager) {
+    init(exerciseManager: ExerciseManager, notificationCenter: UNUserNotificationCenterProtocol = UNUserNotificationCenter.current()) {
         self.exerciseManager = exerciseManager
+        self.notificationCenter = notificationCenter
     }
 
     func pause() {
@@ -79,6 +88,26 @@ class NotificationManager {
 
         let fireDate = Date().addingTimeInterval(300)
         scheduleNotification(for: exercise, at: fireDate, isSnooze: true)
+    }
+
+    func sendTestNotification(for exercise: ExerciseDefinition) {
+        let content = UNMutableNotificationContent()
+        content.title = "Time for: \(exercise.name)"
+        content.body = exercise.instructions
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let request = UNNotificationRequest(
+            identifier: "EXERCISE_NOTIFICATION_TEST_\(exercise.id)_\(UUID().uuidString)",
+            content: content,
+            trigger: trigger
+        )
+
+        notificationCenter.add(request) { error in
+            if let error = error {
+                print("Error scheduling test notification: \(error)")
+            }
+        }
     }
 
     private func scheduleForNextWorkDay(exercise: ExerciseDefinition, from date: Date) {

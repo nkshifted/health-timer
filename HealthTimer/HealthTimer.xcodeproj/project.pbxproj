@@ -16,6 +16,8 @@
 		A1000032000000000000001 /* RemindersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000033000000000000001 /* RemindersViewModel.swift */; };
 		A100002A0000000000000001 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100002B0000000000000001 /* main.swift */; };
 		A2000001000000000000001 /* ReminderSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002000000000000001 /* ReminderSchedulerTests.swift */; };
+		A200000E0000000000000001 /* RemindersViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000F0000000000000001 /* RemindersViewModelTests.swift */; };
+		A2000010000000000000001 /* NotificationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000011000000000000001 /* NotificationManagerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +42,8 @@
 		A1000033000000000000001 /* RemindersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersViewModel.swift; sourceTree = "<group>"; };
 		A100002B0000000000000001 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A2000002000000000000001 /* ReminderSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderSchedulerTests.swift; sourceTree = "<group>"; };
+		A200000F0000000000000001 /* RemindersViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersViewModelTests.swift; sourceTree = "<group>"; };
+		A2000011000000000000001 /* NotificationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManagerTests.swift; sourceTree = "<group>"; };
 		A2000004000000000000001 /* HealthTimerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HealthTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -90,6 +94,8 @@
 			isa = PBXGroup;
 			children = (
 				A2000002000000000000001 /* ReminderSchedulerTests.swift */,
+				A200000F0000000000000001 /* RemindersViewModelTests.swift */,
+				A2000011000000000000001 /* NotificationManagerTests.swift */,
 			);
 			path = HealthTimerTests;
 			sourceTree = "<group>";
@@ -213,6 +219,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A2000001000000000000001 /* ReminderSchedulerTests.swift in Sources */,
+			A200000E0000000000000001 /* RemindersViewModelTests.swift in Sources */,
+			A2000010000000000000001 /* NotificationManagerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

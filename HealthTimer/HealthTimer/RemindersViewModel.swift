@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 final class RemindersViewModel: ObservableObject {
     struct ExerciseRow: Identifiable {
@@ -12,10 +13,14 @@ final class RemindersViewModel: ObservableObject {
 
     private let exerciseManager: ExerciseManager
     private let onScheduleChange: () -> Void
+    private let onTestNotification: (ExerciseDefinition) -> Void
+    private let logger = Logger(subsystem: "com.healthtimer.app", category: "preferences")
+    private var definitionsById: [String: ExerciseDefinition] = [:]
 
-    init(exerciseManager: ExerciseManager, onScheduleChange: @escaping () -> Void) {
+    init(exerciseManager: ExerciseManager, onScheduleChange: @escaping () -> Void, onTestNotification: @escaping (ExerciseDefinition) -> Void = { _ in }) {
         self.exerciseManager = exerciseManager
         self.onScheduleChange = onScheduleChange
+        self.onTestNotification = onTestNotification
         load()
     }
 
@@ -35,8 +40,30 @@ final class RemindersViewModel: ObservableObject {
         onScheduleChange()
     }
 
+    func instructionText(for id: String) -> String {
+        guard let definition = definitionsById[id] else {
+            logger.warning("Missing instructions for exercise id: \(id, privacy: .public)")
+            return "Instructions unavailable."
+        }
+        let trimmed = definition.instructions.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            logger.warning("Empty instructions for exercise id: \(id, privacy: .public)")
+            return "Instructions unavailable."
+        }
+        return definition.instructions
+    }
+
+    func sendTestNotification(id: String) {
+        guard let definition = definitionsById[id] else {
+            logger.warning("Missing exercise for test notification: \(id, privacy: .public)")
+            return
+        }
+        onTestNotification(definition)
+    }
+
     private func load() {
         let definitions = exerciseManager.getExerciseList()
+        definitionsById = Dictionary(uniqueKeysWithValues: definitions.map { ($0.id, $0) })
         let state = exerciseManager.stateById()
         exercises = definitions.map { definition in
             let storedState = state[definition.id]

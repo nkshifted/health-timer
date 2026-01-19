@@ -10,18 +10,18 @@ Improve the Preferences window usability and add per-reminder affordances withou
 4. Defer categories and hydration; no category UI now.
 
 ## UI Changes
-- Preferences window opens at a larger fixed size (e.g., 640×520).
-- Each reminder row shows:
+- Preferences window opens at a fixed size of 640×520 (not resizable).
+- Each reminder row is a compact single-line layout that shows:
   - Name (text)
   - Info button (ⓘ) that opens a popover with instructions
   - Interval picker
   - Enabled toggle
-  - Test button
+  - Test button (text label “Test”)
 - Footer text remains visible (no clipping).
 
 ## Data Flow
 - `RemindersViewModel` builds `exercises` from `ExerciseManager.getExerciseList()` and provides `instructionsById` map.
-- The Info button reads instructions via the map and shows a popover.
+- The Info button reads instructions via the map and shows a popover with the plain stored paragraph text.
 - Test button invokes a callback passed from `AppDelegate` → `PreferencesWindow` → `RemindersViewModel` → row action.
 - `NotificationManager.sendTestNotification(for:)` sends a notification immediately and **does not**:
   - update ExerciseManager state

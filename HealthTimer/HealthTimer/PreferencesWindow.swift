@@ -5,6 +5,7 @@ struct PreferencesWindow: View {
     @AppStorage("workHoursStart") private var workHoursStart: Int = 9
     @AppStorage("workHoursEnd") private var workHoursEnd: Int = 17
     @State private var launchAtLogin: Bool = false
+    @State private var activeInfoExerciseId: String?
     @StateObject private var remindersViewModel: RemindersViewModel
 
     let intervalOptions = [15, 30, 45, 60, 90, 120]
@@ -14,16 +15,18 @@ struct PreferencesWindow: View {
         _remindersViewModel = StateObject(
             wrappedValue: RemindersViewModel(
                 exerciseManager: ExerciseManager(),
-                onScheduleChange: {}
+                onScheduleChange: {},
+                onTestNotification: { _ in }
             )
         )
     }
 
-    init(exerciseManager: ExerciseManager, onScheduleChange: @escaping () -> Void) {
+    init(exerciseManager: ExerciseManager, onScheduleChange: @escaping () -> Void, onTestNotification: @escaping (ExerciseDefinition) -> Void = { _ in }) {
         _remindersViewModel = StateObject(
             wrappedValue: RemindersViewModel(
                 exerciseManager: exerciseManager,
-                onScheduleChange: onScheduleChange
+                onScheduleChange: onScheduleChange,
+                onTestNotification: onTestNotification
             )
         )
     }
@@ -43,7 +46,7 @@ struct PreferencesWindow: View {
                 .foregroundColor(.secondary)
         }
         .padding(20)
-        .frame(width: 520, height: 430)
+        .frame(width: 640, height: 520)
         .onAppear {
             checkLaunchAtLoginStatus()
         }
@@ -92,9 +95,31 @@ struct PreferencesWindow: View {
     private var remindersList: some View {
         VStack(alignment: .leading, spacing: 10) {
             ForEach($remindersViewModel.exercises, id: \.id) { exercise in
-                HStack {
+                HStack(spacing: 12) {
                     Text(exercise.wrappedValue.name)
-                        .frame(width: 180, alignment: .leading)
+                        .frame(width: 160, alignment: .leading)
+
+                    Button {
+                        activeInfoExerciseId = exercise.wrappedValue.id
+                    } label: {
+                        Image(systemName: "info.circle")
+                    }
+                    .buttonStyle(.plain)
+                    .help("Show instructions")
+                    .popover(
+                        isPresented: Binding(
+                            get: { activeInfoExerciseId == exercise.wrappedValue.id },
+                            set: { isPresented in
+                                if !isPresented {
+                                    activeInfoExerciseId = nil
+                                }
+                            }
+                        )
+                    ) {
+                        Text(remindersViewModel.instructionText(for: exercise.wrappedValue.id))
+                            .frame(width: 280, alignment: .leading)
+                            .padding(12)
+                    }
 
                     Picker("", selection: exercise.intervalMinutes) {
                         ForEach(0..<intervalOptions.count, id: \.self) { (index: Int) in
@@ -114,6 +139,10 @@ struct PreferencesWindow: View {
                         .onChange(of: exercise.enabled.wrappedValue) { newValue in
                             remindersViewModel.updateEnabled(id: exercise.wrappedValue.id, enabled: newValue)
                         }
+
+                    Button("Test") {
+                        remindersViewModel.sendTestNotification(id: exercise.wrappedValue.id)
+                    }
                 }
             }
         }
