@@ -12,6 +12,7 @@
 		A1000005000000000000001 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000006000000000000001 /* NotificationManager.swift */; };
 		A1000007000000000000001 /* PreferencesWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000008000000000000001 /* PreferencesWindow.swift */; };
 		A1000009000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000010000000000000001 /* Assets.xcassets */; };
+		A1000030000000000000001 /* ReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000031000000000000001 /* ReminderScheduler.swift */; };
 		A100002A0000000000000001 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100002B0000000000000001 /* main.swift */; };
 		A2000001000000000000001 /* ReminderSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002000000000000001 /* ReminderSchedulerTests.swift */; };
 /* End PBXBuildFile section */
@@ -34,6 +35,7 @@
 		A1000008000000000000001 /* PreferencesWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindow.swift; sourceTree = "<group>"; };
 		A1000010000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000012000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1000031000000000000001 /* ReminderScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderScheduler.swift; sourceTree = "<group>"; };
 		A100002B0000000000000001 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A2000002000000000000001 /* ReminderSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderSchedulerTests.swift; sourceTree = "<group>"; };
 		A2000004000000000000001 /* HealthTimerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HealthTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -72,6 +74,7 @@
 				A1000002000000000000001 /* AppDelegate.swift */,
 				A100002B0000000000000001 /* main.swift */,
 				A1000004000000000000001 /* ExerciseManager.swift */,
+				A1000031000000000000001 /* ReminderScheduler.swift */,
 				A1000006000000000000001 /* NotificationManager.swift */,
 				A1000008000000000000001 /* PreferencesWindow.swift */,
 				A1000010000000000000001 /* Assets.xcassets */,
@@ -195,6 +198,7 @@
 				A1000001000000000000001 /* AppDelegate.swift in Sources */,
 				A100002A0000000000000001 /* main.swift in Sources */,
 				A1000003000000000000001 /* ExerciseManager.swift in Sources */,
+				A1000030000000000000001 /* ReminderScheduler.swift in Sources */,
 				A1000005000000000000001 /* NotificationManager.swift in Sources */,
 				A1000007000000000000001 /* PreferencesWindow.swift in Sources */,
 			);

@@ -107,7 +107,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         if response.actionIdentifier == "SNOOZE_ACTION" {
             let exerciseName = notification.request.content.title.replacingOccurrences(of: "Time for: ", with: "")
             let exerciseInstructions = notification.request.content.body
-            let exercise = Exercise(name: exerciseName, instructions: exerciseInstructions)
+            let exerciseId = exerciseName.lowercased().replacingOccurrences(of: " ", with: "-")
+            let exercise = ExerciseDefinition(id: exerciseId, name: exerciseName, instructions: exerciseInstructions, defaultIntervalMinutes: 0)
             notificationManager.snooze(exercise: exercise, preserveIndex: exerciseManager.currentIndex)
         } else if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
             if !isSnooze {

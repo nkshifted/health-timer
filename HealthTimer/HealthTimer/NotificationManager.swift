@@ -3,7 +3,7 @@ import UserNotifications
 
 class NotificationManager {
     private let exerciseManager: ExerciseManager
-    private var currentExercise: Exercise?
+    private var currentExercise: ExerciseDefinition?
 
     private var timerInterval: Int {
         let interval = UserDefaults.standard.integer(forKey: "timerInterval")
@@ -92,7 +92,7 @@ class NotificationManager {
         }
     }
 
-    func snooze(exercise: Exercise, preserveIndex: Int) {
+    func snooze(exercise: ExerciseDefinition, preserveIndex: Int) {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
 
         let content = UNMutableNotificationContent()
