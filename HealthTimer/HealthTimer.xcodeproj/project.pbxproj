@@ -13,7 +13,18 @@
 		A1000007000000000000001 /* PreferencesWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000008000000000000001 /* PreferencesWindow.swift */; };
 		A1000009000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000010000000000000001 /* Assets.xcassets */; };
 		A100002A0000000000000001 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100002B0000000000000001 /* main.swift */; };
+		A2000001000000000000001 /* ReminderSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002000000000000001 /* ReminderSchedulerTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A2000003000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1000021000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A1000017000000000000001;
+			remoteInfo = HealthTimer;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		A1000011000000000000001 /* HealthTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HealthTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -24,10 +35,19 @@
 		A1000010000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000012000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A100002B0000000000000001 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		A2000002000000000000001 /* ReminderSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderSchedulerTests.swift; sourceTree = "<group>"; };
+		A2000004000000000000001 /* HealthTimerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HealthTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A1000013000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2000005000000000000001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -41,6 +61,7 @@
 			isa = PBXGroup;
 			children = (
 				A1000015000000000000001 /* HealthTimer */,
+				A2000006000000000000001 /* HealthTimerTests */,
 				A1000016000000000000001 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -59,10 +80,19 @@
 			path = HealthTimer;
 			sourceTree = "<group>";
 		};
+		A2000006000000000000001 /* HealthTimerTests */ = {
+			isa = PBXGroup;
+			children = (
+				A2000002000000000000001 /* ReminderSchedulerTests.swift */,
+			);
+			path = HealthTimerTests;
+			sourceTree = "<group>";
+		};
 		A1000016000000000000001 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				A1000011000000000000001 /* HealthTimer.app */,
+				A2000004000000000000001 /* HealthTimerTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -86,6 +116,24 @@
 			productName = HealthTimer;
 			productReference = A1000011000000000000001 /* HealthTimer.app */;
 			productType = "com.apple.product-type.application";
+		};
+		A2000007000000000000001 /* HealthTimerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A2000008000000000000001 /* Build configuration list for PBXNativeTarget "HealthTimerTests" */;
+			buildPhases = (
+				A2000009000000000000001 /* Sources */,
+				A2000005000000000000001 /* Frameworks */,
+				A200000A0000000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A200000B0000000000000001 /* PBXTargetDependency */,
+			);
+			name = HealthTimerTests;
+			productName = HealthTimerTests;
+			productReference = A2000004000000000000001 /* HealthTimerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -116,6 +164,7 @@
 			projectRoot = "";
 			targets = (
 				A1000017000000000000001 /* HealthTimer */,
+				A2000007000000000000001 /* HealthTimerTests */,
 			);
 		};
 /* End PBXProject section */
@@ -126,6 +175,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000009000000000000001 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A200000A0000000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,7 +200,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A2000009000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2000001000000000000001 /* ReminderSchedulerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A200000B0000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A1000017000000000000001 /* HealthTimer */;
+			targetProxy = A2000003000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A1000023000000000000001 /* Debug */ = {
@@ -319,6 +391,50 @@
 			};
 			name = Release;
 		};
+		A200000C0000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "HealthTimerTests";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.healthtimer.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HealthTimer.app/Contents/MacOS/HealthTimer";
+			};
+			name = Debug;
+		};
+		A200000D0000000000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "HealthTimerTests";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.healthtimer.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HealthTimer.app/Contents/MacOS/HealthTimer";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -336,6 +452,15 @@
 			buildConfigurations = (
 				A1000023000000000000001 /* Debug */,
 				A1000024000000000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2000008000000000000001 /* Build configuration list for PBXNativeTarget "HealthTimerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A200000C0000000000000001 /* Debug */,
+				A200000D0000000000000001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
