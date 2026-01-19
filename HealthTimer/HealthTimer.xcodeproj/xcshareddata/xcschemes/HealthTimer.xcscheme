@@ -21,6 +21,20 @@
                ReferencedContainer = "container:HealthTimer.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A2000007000000000000001"
+               BuildableName = "HealthTimerTests.xctest"
+               BlueprintName = "HealthTimerTests"
+               ReferencedContainer = "container:HealthTimer.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
