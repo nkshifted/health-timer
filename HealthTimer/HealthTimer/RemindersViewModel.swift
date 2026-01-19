@@ -20,11 +20,17 @@ final class RemindersViewModel: ObservableObject {
     }
 
     func updateInterval(id: String, minutes: Int) {
+        if let index = exercises.firstIndex(where: { $0.id == id }) {
+            exercises[index].intervalMinutes = minutes
+        }
         exerciseManager.updateInterval(id: id, minutes: minutes)
         onScheduleChange()
     }
 
     func updateEnabled(id: String, enabled: Bool) {
+        if let index = exercises.firstIndex(where: { $0.id == id }) {
+            exercises[index].enabled = enabled
+        }
         exerciseManager.updateEnabled(id: id, enabled: enabled)
         onScheduleChange()
     }
