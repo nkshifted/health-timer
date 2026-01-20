@@ -12,6 +12,8 @@ class NotificationManager {
     private let exerciseManager: ExerciseManager
     private let notificationCenter: UNUserNotificationCenterProtocol
     private let pausedKey = "remindersPaused"
+    private let scheduledExerciseIdKey = "scheduledReminder.exerciseId"
+    private let scheduledFireDateKey = "scheduledReminder.fireDate"
 
     private var workHoursStart: Int {
         if UserDefaults.standard.object(forKey: "workHoursStart") == nil {
@@ -35,6 +37,7 @@ class NotificationManager {
     func pause() {
         UserDefaults.standard.set(true, forKey: pausedKey)
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        clearScheduledReminder()
     }
 
     func resume() {
@@ -62,15 +65,18 @@ class NotificationManager {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
 
         if isPaused() {
+            clearScheduledReminder()
             return
         }
 
         let now = Date()
 
         guard let exercise = exerciseManager.nextDueExercise(now: now) else {
+            clearScheduledReminder()
             return
         }
         guard let nextDueDate = exerciseManager.nextDueDate(now: now) else {
+            clearScheduledReminder()
             return
         }
 
@@ -88,6 +94,21 @@ class NotificationManager {
 
         let fireDate = Date().addingTimeInterval(300)
         scheduleNotification(for: exercise, at: fireDate, isSnooze: true)
+    }
+
+    @discardableResult
+    func handleDueReminderIfNeeded(now: Date = Date()) -> Bool {
+        guard !isPaused() else { return false }
+        guard let exerciseId = UserDefaults.standard.string(forKey: scheduledExerciseIdKey),
+              let fireDate = UserDefaults.standard.object(forKey: scheduledFireDateKey) as? Date else {
+            return false
+        }
+        guard fireDate <= now else { return false }
+
+        exerciseManager.markFired(id: exerciseId, at: fireDate)
+        exerciseManager.updateRecentHistory(with: exerciseId)
+        clearScheduledReminder()
+        return true
     }
 
     func sendTestNotification(for exercise: ExerciseDefinition) {
@@ -154,6 +175,7 @@ class NotificationManager {
                 print("Error scheduling notification: \(error)")
             }
         }
+        recordScheduledReminder(exerciseId: exercise.id, fireDate: date)
     }
 
     private func isWithinWorkHours(date: Date) -> Bool {
@@ -174,5 +196,15 @@ class NotificationManager {
             nextDate = calendar.date(byAdding: .day, value: 1, to: nextDate) ?? nextDate
         }
         return nextDate
+    }
+
+    private func recordScheduledReminder(exerciseId: String, fireDate: Date) {
+        UserDefaults.standard.set(exerciseId, forKey: scheduledExerciseIdKey)
+        UserDefaults.standard.set(fireDate, forKey: scheduledFireDateKey)
+    }
+
+    private func clearScheduledReminder() {
+        UserDefaults.standard.removeObject(forKey: scheduledExerciseIdKey)
+        UserDefaults.standard.removeObject(forKey: scheduledFireDateKey)
     }
 }

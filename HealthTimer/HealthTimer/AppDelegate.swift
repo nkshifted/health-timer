@@ -142,6 +142,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         toggleRemindersItem.title = "Pause Reminders"
 
         let now = Date()
+        if notificationManager.handleDueReminderIfNeeded(now: now) {
+            notificationManager.scheduleNextNotification()
+        }
         if let status = notificationManager.nextReminderStatus(now: now) {
             let remaining = max(0, status.fireDate.timeIntervalSince(now))
             let minutes = Int(remaining / 60)
@@ -185,6 +188,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             notificationManager.snooze(exercise: exercise, preserveIndex: exerciseManager.currentIndex)
             updateMenuStatus()
         } else if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+            _ = notificationManager.handleDueReminderIfNeeded(now: Date())
             if !isSnooze {
                 exerciseManager.advanceToNextExercise()
             }
